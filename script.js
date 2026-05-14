@@ -35,18 +35,17 @@ let currentIndex = 0;
 let startX = 0;
 let isDragging = false;
 
-track.addEventListener('touchstart', e=>{
-  startX = e.touches[0].clientX;
+function handleStart(x) {
+  startX = x;
   isDragging = true;
-});
+}
 
-track.addEventListener('touchmove', e=>{
+function handleMove(x) {
   if(!isDragging) return;
-  let moveX = e.touches[0].clientX;
-  let diff = startX - moveX;
+  let diff = startX - x;
 
   if(diff > 50){
-    currentIndex = Math.min(currentIndex + 1, 5);
+    currentIndex = Math.min(currentIndex + 1, 3);
     moveCarousel();
     isDragging = false;
   }
@@ -56,8 +55,36 @@ track.addEventListener('touchmove', e=>{
     moveCarousel();
     isDragging = false;
   }
-});
+}
 
 function moveCarousel(){
   track.style.transform = `translateX(-${currentIndex * 100}%)`;
 }
+
+// Touch events
+track.addEventListener('touchstart', e=>{
+  e.preventDefault();
+  handleStart(e.touches[0].clientX);
+}, { passive: false });
+
+track.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  handleMove(e.touches[0].clientX);
+}, { passive: false });
+
+// Mouse events (desktop)
+track.addEventListener('mousedown', e=>{
+  handleStart(e.clientX);
+});
+
+track.addEventListener('mousemove', e=>{
+  handleMove(e.clientX);
+});
+
+track.addEventListener('mouseup', ()=>{
+  isDragging = false;
+});
+
+track.addEventListener('mouseleave', ()=>{
+  isDragging = false;
+});
